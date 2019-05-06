@@ -72,7 +72,6 @@
 #define PSCI_AFFINITY_LEVEL(lvl) ((lvl & 0x3) << 24)
 #define BIAS_HYST (bias_hyst * NSEC_PER_MSEC)
 
-
 static struct system_pm_ops *sys_pm_ops;
 
 
@@ -1096,7 +1095,6 @@ static int cluster_configure(struct lpm_cluster *cluster, int idx,
 		sec_debug_cluster_lpm_log(cluster->cluster_name, idx,
 			cluster->num_children_in_sync.bits[0],
 			cluster->child_cpus.bits[0], from_idle, 1);
-
 		trace_cluster_enter(cluster->cluster_name, idx,
 			cluster->num_children_in_sync.bits[0],
 			cluster->child_cpus.bits[0], from_idle);
