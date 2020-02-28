@@ -28,22 +28,6 @@
 #include <linux/vmpressure.h>
 
 /*
- * The window size (vmpressure_win) is the number of scanned pages before
- * we try to analyze scanned/reclaimed ratio. So the window is used as a
- * rate-limit tunable for the "low" level notification, and also for
- * averaging the ratio for medium/critical levels. Using small window
- * sizes can cause lot of false positives, but too big window size will
- * delay the notifications.
- *
- * As the vmscan reclaimer logic works with chunks which are multiple of
- * SWAP_CLUSTER_MAX, it makes sense to use it for the window size as well.
- *
- * TODO: Make the window size depend on machine size, as we do for vmstat
- * thresholds. Currently we set it to 512 pages (2MB for 4KB pages).
- */
-static unsigned long vmpressure_win = SWAP_CLUSTER_MAX * 16;
-
-/*
  * These thresholds are used when we account memory pressure through
  * scanned/reclaimed ratio. The current values were chosen empirically. In
  * essence, they are percents: the higher the value, the more number
@@ -438,114 +422,9 @@ static void __vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool critical,
  * This function does not return any value.
  */
 void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
-		unsigned long scanned, unsigned long reclaimed, int order)
+		unsigned long scanned, unsigned long reclaimed)
 {
-	if (order > PAGE_ALLOC_COSTLY_ORDER)
-		return;
-
 	__vmpressure(gfp, memcg, false, tree, scanned, reclaimed);
-}
-#else
-static void vmpressure_memcg(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
-		unsigned long scanned, unsigned long reclaimed)
-{
-}
-#endif
-
-static void calculate_vmpressure_win(void)
-{
-	long x;
-
-	x = global_node_page_state(NR_FILE_PAGES) -
-			global_node_page_state(NR_SHMEM) -
-			total_swapcache_pages() +
-			global_zone_page_state(NR_FREE_PAGES);
-	if (x < 1)
-		x = 1;
-	/*
-	 * For low (free + cached), vmpressure window should be
-	 * small, and high for higher values of (free + cached).
-	 * But it should not be linear as well. This ensures
-	 * timely vmpressure notifications when system is under
-	 * memory pressure, and optimal number of events when
-	 * cached is high. The sqaure root function is empirically
-	 * found to serve the purpose.
-	 */
-	x = int_sqrt(x);
-	vmpressure_win = x;
-}
-
-static void vmpressure_global(gfp_t gfp, unsigned long scanned,
-		unsigned long reclaimed)
-{
-	struct vmpressure *vmpr = &global_vmpressure;
-	unsigned long pressure;
-	unsigned long stall;
-
-	if (scanned) {
-		spin_lock(&vmpr->sr_lock);
-		if (!vmpr->scanned)
-			calculate_vmpressure_win();
-
-		vmpr->scanned += scanned;
-		vmpr->reclaimed += reclaimed;
-
-		if (!current_is_kswapd())
-			vmpr->stall += scanned;
-
-		stall = vmpr->stall;
-		scanned = vmpr->scanned;
-		reclaimed = vmpr->reclaimed;
-		spin_unlock(&vmpr->sr_lock);
-
-		if (scanned < vmpressure_win)
-			return;
-	}
-
-	spin_lock(&vmpr->sr_lock);
-	vmpr->scanned = 0;
-	vmpr->reclaimed = 0;
-	vmpr->stall = 0;
-	spin_unlock(&vmpr->sr_lock);
-
-	if (scanned) {
-		pressure = vmpressure_calc_pressure(scanned, reclaimed);
-		pressure = vmpressure_account_stall(pressure, stall, scanned);
-	} else {
-		pressure = 100;
-	}
-	vmpressure_notify(pressure);
-}
-
-/**
- * vmpressure() - Account memory pressure through scanned/reclaimed ratio
- * @gfp:	reclaimer's gfp mask
- * @memcg:	cgroup memory controller handle
- * @tree:	legacy subtree mode
- * @scanned:	number of pages scanned
- * @reclaimed:	number of pages reclaimed
- *
- * This function should be called from the vmscan reclaim path to account
- * "instantaneous" memory pressure (scanned/reclaimed ratio). The raw
- * pressure index is then further refined and averaged over time.
- *
- * If @tree is set, vmpressure is in traditional userspace reporting
- * mode: @memcg is considered the pressure root and userspace is
- * notified of the entire subtree's reclaim efficiency.
- *
- * If @tree is not set, reclaim efficiency is recorded for @memcg, and
- * only in-kernel users are notified.
- *
- * This function does not return any value.
- */
-void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
-		unsigned long scanned, unsigned long reclaimed)
-{
-	if (!memcg && tree)
-		vmpressure_global(gfp, scanned, reclaimed);
-
-	if (IS_ENABLED(CONFIG_MEMCG))
-		vmpressure_memcg(gfp, memcg, tree, scanned, reclaimed);
 }
 
 /**
