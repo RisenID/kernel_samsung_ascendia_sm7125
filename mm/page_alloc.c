@@ -4089,7 +4089,6 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
 	u64 utime, stime_s, stime_e, stime_d;
 
 	task_cputime(current, &utime, &stime_s);
-	pg_data_t *pgdat = ac->preferred_zoneref->zone->zone_pgdat;
 	bool woke_kswapd = false;
 
 	/*
@@ -6337,7 +6336,6 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat)
 	pgdat_page_ext_init(pgdat);
 	spin_lock_init(&pgdat->lru_lock);
 	lruvec_init(node_lruvec(pgdat));
-	pgdat->kswapd_waiters = (atomic_t)ATOMIC_INIT(0);
 
 	pgdat->per_cpu_nodestats = &boot_nodestats;
 
