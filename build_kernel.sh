@@ -3,7 +3,7 @@
 ARCH=arm64
 
 # Toolchain paths
-PATH="/home/simon/lineage-19.1/prebuilts/clang/host/linux-x86/clang-r383902/bin:/home/simon/lineage-19.1/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin:/home/simon/lineage-19.1/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin:${PATH}"
+PATH="../toolchains/clang/clang-r383902/bin:../toolchains/gcc/aarch64/bin:../toolchains/gcc/arm/bin:${PATH}"
 
 if [[ "$1" == "a52q" ]]; then
     make -j$(nproc --all) ARCH=$ARCH CC=clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- vendor/a52q_eur_open_defconfig
