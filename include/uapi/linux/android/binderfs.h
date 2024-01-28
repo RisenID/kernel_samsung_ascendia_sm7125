@@ -22,8 +22,8 @@
  */
 struct binderfs_device {
 	char name[BINDERFS_MAX_NAME + 1];
-	__u32 major;
-	__u32 minor;
+	__u8 major;
+	__u8 minor;
 };
 
 /**
@@ -32,4 +32,3 @@ struct binderfs_device {
 #define BINDER_CTL_ADD _IOWR('b', 1, struct binderfs_device)
 
 #endif /* _UAPI_LINUX_BINDER_CTL_H */
-
