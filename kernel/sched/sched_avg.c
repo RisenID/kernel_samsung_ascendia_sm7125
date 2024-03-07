@@ -110,8 +110,10 @@ static inline void update_last_busy_time(int cpu, bool dequeue,
 	bool nr_run_trigger = false, load_trigger = false;
 	bool is_sched_boost = false;
 
+#ifdef CONFIG_SCHED_SEC_TASK_BOOST
 	if (sysctl_sched_boost > 0)
 		is_sched_boost = true;
+#endif
 
 	if (!hmp_capable() || is_min_capacity_cpu(cpu))
 		return;

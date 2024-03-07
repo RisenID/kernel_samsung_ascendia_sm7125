@@ -23,7 +23,9 @@
  * boost is responsible for disabling it as well.
  */
 
+#ifdef CONFIG_SCHED_SEC_TASK_BOOST
 unsigned int sysctl_sched_boost; /* To/from userspace */
+#endif
 unsigned int sched_boost_type; /* currently activated sched boost */
 enum sched_boost_policy boost_policy;
 
@@ -212,6 +214,7 @@ static void sched_boost_disable_all(void)
 	}
 }
 
+#ifdef CONFIG_SCHED_SEC_TASK_BOOST
 static void _sched_set_boost(int type)
 {
 	if (type == 0)
@@ -233,6 +236,7 @@ static void _sched_set_boost(int type)
 	set_boost_policy(sysctl_sched_boost);
 	trace_sched_set_boost(sysctl_sched_boost);
 }
+#endif
 
 void sched_boost_parse_dt(void)
 {
