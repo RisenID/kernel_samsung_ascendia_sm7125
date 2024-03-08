@@ -241,10 +241,12 @@ static struct notifier_block nb_gpio_keys = {
 
 static int __init sec_tsp_dumpkey_init(void)
 {
+#ifdef CONFIG_SEC_DEBUG
 	/* only work for debug level is low */
 //	if (unlikely(!sec_debug_is_enabled()))
 		sec_kn_register_notifier(&nb_gpio_keys,
 				used_keys, ARRAY_SIZE(used_keys));
+#endif
 	return 0;
 }
 

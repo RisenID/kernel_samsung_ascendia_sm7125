@@ -925,10 +925,12 @@ int ss_smmu_debug_init(struct samsung_display_driver_data *vdd)
 	int ret = 0;
 
 	/* This debug is available by sde_debug enabled condition */
+#if defined(CONFIG_SEC_DEBUG)
 	if (!sec_debug_is_enabled()) {
 		LCD_ERR("sec_debug_is_enabled : %d\n", sec_debug_is_enabled());
 		goto init_fail;
 	}
+#endif
 
 	/* Create KMEM_CACHE slab */
 	if (IS_ERR_OR_NULL(vdd->ss_debug_smmu_cache)) {

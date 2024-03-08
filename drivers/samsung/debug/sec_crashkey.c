@@ -256,10 +256,11 @@ static int __init sec_crashkey_init(void)
 {
 	int err;
 
-	if (!sec_debug_is_enabled())
+#ifndef CONFIG_SEC_DEBUG
 		key_event_state = &crashkey_user_state;
-	else
+else
 		key_event_state = &crashkey_state;
+#endif
 
 	__sec_crashkey_parse_dt_replace_keymap();
 
