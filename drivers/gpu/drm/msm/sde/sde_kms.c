@@ -868,7 +868,7 @@ static int _sde_kms_release_splash_buffer(unsigned int mem_addr,
 
 #if defined(CONFIG_DISPLAY_SAMSUNG_LEGO)
 	SDE_INFO("release splash buffer: addr: %x, size: %x, sec_debug: %d\n",
-			mem_addr, splash_buffer_size, sec_debug_is_enabled());
+			mem_addr, splash_buffer_size);
 #endif
 
 	return ret;
