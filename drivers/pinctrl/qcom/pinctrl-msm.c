@@ -45,7 +45,7 @@
 #include <linux/notifier.h>
 #endif
 
-#ifdef CONFIG_SEC_PM_DEBUG
+#ifdef CONFIG_SEC_PM
 #include <linux/sec-pinmux.h>
 #endif
 
