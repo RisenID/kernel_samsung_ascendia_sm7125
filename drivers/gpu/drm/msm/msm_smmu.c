@@ -273,11 +273,11 @@ static int msm_smmu_map_dma_buf(struct msm_mmu *mmu, struct sg_table *sgt,
 				dir, attrs, client->secure);
 	}
 
-#if defined(CONFIG_DISPLAY_SAMSUNG)
-	if (sec_debug_is_enabled() && sgt && sgt->sgl)
+#if defined(CONFIG_DISPLAY_SAMSUNG) && defined(CONFIG_SEC_DEBUG)
+	if (sgt && sgt->sgl)
 		ss_smmu_debug_map(SMMU_RT_DISPLAY_DEBUG, 0, NULL, sgt);
-#elif defined(CONFIG_DISPLAY_SAMSUNG_LEGO)
-	if (sec_debug_is_enabled() && sgt && sgt->sgl)
+#elif defined(CONFIG_DISPLAY_SAMSUNG_LEGO) && defined(CONFIG_SEC_DEBUG)
+	if (sgt && sgt->sgl)
 		ss_smmu_debug_map(SMMU_RT_DISPLAY_DEBUG, sgt);
 #endif
 
@@ -304,11 +304,11 @@ static void msm_smmu_unmap_dma_buf(struct msm_mmu *mmu, struct sg_table *sgt,
 				dir, client->secure);
 	}
 
-#if defined(CONFIG_DISPLAY_SAMSUNG)
-	if (sec_debug_is_enabled() && sgt && sgt->sgl)
+#if defined(CONFIG_DISPLAY_SAMSUNG) && defined(CONFIG_SEC_DEBUG)
+	if (sgt && sgt->sgl)
 		ss_smmu_debug_unmap(SMMU_RT_DISPLAY_DEBUG, sgt);
-#elif defined(CONFIG_DISPLAY_SAMSUNG_LEGO)
-	if (sec_debug_is_enabled() && sgt && sgt->sgl)
+#elif defined(CONFIG_DISPLAY_SAMSUNG_LEGO) && defined(CONFIG_SEC_DEBUG)
+	if (sgt && sgt->sgl)
 		ss_smmu_debug_unmap(SMMU_RT_DISPLAY_DEBUG, sgt);
 #endif
 
