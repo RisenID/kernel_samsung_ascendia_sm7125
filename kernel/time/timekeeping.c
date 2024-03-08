@@ -1564,7 +1564,7 @@ static void __timekeeping_inject_sleeptime(struct timekeeper *tk,
 	tk_debug_account_sleep_time(delta);
 }
 
-#if IS_ENABLED(CONFIG_SEC_PM)
+#ifdef CONFIG_SEC_PM_DEBUG
 void sec_debug_print_sleep_time(void)
 {
 	pr_info("PM: Timekeeping suspended for %lld.%03lu seconds\n",
