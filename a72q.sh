@@ -33,7 +33,7 @@ echo "Making boot image"
 echo " "
 
 cd ../builds/ascendia/a72q/oneui_ksu/
-magiskboot_x86 repack boot.img Ascendia_3.1_KSU_OneUI_a72q_boot.img
+magiskboot_x86 repack boot.img Ascendia_3.1.1_KSU_OneUI_a72q_boot.img
 
 rm ../../pack_ksu/ascendia/a72/oneui.img
-cp Ascendia_3.1_KSU_OneUI_a72q_boot.img ../../pack_ksu/ascendia/a72/oneui.img
+cp Ascendia_3.1.1_KSU_OneUI_a72q_boot.img ../../pack_ksu/ascendia/a72/oneui.img
