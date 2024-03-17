@@ -33,7 +33,7 @@ echo "Making boot image"
 echo " "
 
 cd ../builds/ascendia/a52q/aosp_ksu/
-magiskboot_x86 repack boot.img Ascendia_3.1_KSU_AOSP_a52q_boot.img
+magiskboot_x86 repack boot.img Ascendia_3.1.1_KSU_AOSP_a52q_boot.img
 
 rm ../../pack_ksu/ascendia/a52/aosp.img
-cp Ascendia_3.1_KSU_AOSP_a52q_boot.img ../../pack_ksu/ascendia/a52/aosp.img
+cp Ascendia_3.1.1_KSU_AOSP_a52q_boot.img ../../pack_ksu/ascendia/a52/aosp.img
