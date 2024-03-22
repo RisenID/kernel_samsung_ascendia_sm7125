@@ -33,7 +33,20 @@ echo "Making boot image"
 echo " "
 
 cd ../builds/ascendia/a72q/oneui_ksu/
-magiskboot_x86 repack boot.img Ascendia_3.1.1_KSU_OneUI_a72q_boot.img
+magiskboot_x86 repack boot.img Ascendia_3.1.2_KSU_OneUI_a72q_boot.img
 
 rm ../../pack_ksu/ascendia/a72/oneui.img
-cp Ascendia_3.1.1_KSU_OneUI_a72q_boot.img ../../pack_ksu/ascendia/a72/oneui.img
+cp Ascendia_3.1.2_KSU_OneUI_a72q_boot.img ../../pack_ksu/ascendia/a72/oneui.img
+
+if [ ! -e ../../v3/3.1.2/ ]
+then
+echo " "
+echo "Making save dir"
+echo " "
+mkdir ../../v3/3.1.2
+fi
+
+mv Ascendia_3.1.2_KSU_OneUI_a72q_boot.img ../../v3/3.1.2/
+
+cd ../../pack_ksu/
+sed -i -e 's/3.1.1/3.1.2/g' META-INF/com/google/android/update-binary
