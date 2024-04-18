@@ -35,7 +35,9 @@
 #include <linux/qpnp/qpnp-pbs.h>
 #include <linux/qpnp/qpnp-misc.h>
 
+#ifdef CONFIG_SEC_DEBUG
 #include <linux/sec_debug.h>
+#endif
 
 #ifdef CONFIG_SEC_PM
 int pon_index[2];	/* Array size is # of pmic */
