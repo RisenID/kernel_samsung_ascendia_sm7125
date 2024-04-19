@@ -8,45 +8,51 @@ then
     rm -rf out
 fi
 
-PATH="../../toolchains/clang/clang-r383902/bin:../../toolchains/gcc/aarch64/bin:../../toolchains/gcc/arm/bin:${PATH}"
-
+PATH="$HOME/android/toolchains/clang/clang-r416183c2/bin:$PATH"
+export LD_LIBRARY_PATH="$HOME/android/toolchains/clang/clang-r416183c2/lib64:$LD_LIBRARY_PATH"
 export ARCH=arm64
 
 make ARCH=arm64 O=out vendor/a72q_eur_open_defconfig
-
-make ARCH=arm64 O=out -j24 CC=clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi-
+make -j$(nproc --all) O=out ARCH=arm64 CC="ccache clang" AR="llvm-ar" NM="llvm-nm" LD="ld.lld" AS="llvm-as" STRIP="llvm-strip" OBJCOPY="llvm-objcopy" OBJDUMP="llvm-objdump" CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
 echo " "
 echo "Build Complete!"
 echo " "
 
-rm ../builds/ascendia/a72q/oneui_ksu/dtb
-rm ../builds/ascendia/a72q/oneui_ksu/kernel
+if [ -e "out/arch/arm64/boot/Image.gz" ]; then
+    rm ../../builds/ascendia/sm7125/a72q/oneui_ksu/dtb
+    rm ../../builds/ascendia/sm7125/a72q/oneui_ksu/kernel
 
-cp out/arch/arm64/boot/Image ../builds/ascendia/a72q/oneui_ksu/kernel
-cp out/arch/arm64/boot/dts/qcom/atoll-ab-idp.dtb ../builds/ascendia/a72q/oneui_ksu/dtb
+    cp out/arch/arm64/boot/Image ../../builds/ascendia/sm7125/a72q/oneui_ksu/kernel
+    cp out/arch/arm64/boot/dts/qcom/atoll-ab-idp.dtb ../../builds/ascendia/sm7125/a72q/oneui_ksu/dtb
 
-rm -rf out/
+    rm -rf out/
 
-echo " "
-echo "Making boot image"
-echo " "
+    echo " "
+    echo "Making boot image"
+    echo " "
 
-cd ../builds/ascendia/a72q/oneui_ksu/
-magiskboot_x86 repack boot.img Ascendia_3.1.2_KSU_OneUI_a72q_boot.img
+    cd ../../builds/ascendia/sm7125/a72q/oneui_ksu/
+    magiskboot_x86 repack boot.img Ascendia_3.2_KSU_OneUI_a72q_boot.img
 
-rm ../../pack_ksu/ascendia/a72/oneui.img
-cp Ascendia_3.1.2_KSU_OneUI_a72q_boot.img ../../pack_ksu/ascendia/a72/oneui.img
+    rm ../../pack_ksu/ascendia/a72/oneui.img
+    cp Ascendia_3.2_KSU_OneUI_a72q_boot.img ../../pack_ksu/ascendia/a72/oneui.img
 
-if [ ! -e ../../v3/3.1.2/ ]
-then
-echo " "
-echo "Making save dir"
-echo " "
-mkdir ../../v3/3.1.2
+    if [ ! -e ../../v3/3.2/ ]
+    then
+    echo " "
+    echo "Making save dir"
+    echo " "
+    mkdir ../../v3/3.2
+    fi
+
+    mv Ascendia_3.2_KSU_OneUI_a72q_boot.img ../../v3/3.2/
+
+    cd ../../pack_ksu/
+    sed -i -e 's/3.1.1/3.2/g' META-INF/com/google/android/update-binary
+else 
+    echo " "
+    echo "Build Failed :("
+    echo " "
+    rm -rf out/
 fi
-
-mv Ascendia_3.1.2_KSU_OneUI_a72q_boot.img ../../v3/3.1.2/
-
-cd ../../pack_ksu/
-sed -i -e 's/3.1.1/3.1.2/g' META-INF/com/google/android/update-binary
