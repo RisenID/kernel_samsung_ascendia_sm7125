@@ -22,6 +22,12 @@ config SEC_DEBUG
 	tristate "Enable Samsung Debugging features"
 	default n
 
+config SEC_DEBUG_DUMMY
+	tristate "Enable Dummy Samsung Debugging features"
+	default y
+	help
+	  Dummy no-op config
+
 config SEC_PARAM
 	bool "Enable Param modification"
 	default n

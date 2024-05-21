@@ -6,6 +6,8 @@ obj-$(CONFIG_SEC_DEBUG)			+= sec_debug.o \
 					   sec_crashkey.o \
 					   sec_crashkey_long.o
 
+obj-$(CONFIG_SEC_DEBUG_DUMMY)			+= sec_debug.o 
+
 obj-$(CONFIG_SEC_LOG_BUF)		+= sec_log_buf.o \
 					   sec_init_log.o
 

@@ -54,7 +54,7 @@ enum pon_power_off_type {
 	PON_POWER_OFF_MAX_TYPE		= 0x10,
 };
 
-#if IS_ENABLED(CONFIG_SEC_DEBUG)
+#if IS_ENABLED(CONFIG_SEC_DEBUG) || IS_ENABLED(CONFIG_SEC_DEBUG_DUMMY)
 #include <linux/sec_debug.h>
 #else
 enum pon_restart_reason {
@@ -70,7 +70,7 @@ enum pon_restart_reason {
 #endif
 
 
-#ifdef CONFIG_SEC_PM
+#ifdef CONFIG_SEC_PM || CONFIG_SEC_PM_DUMMY
 int qpnp_pon_check_chg_det(void);
 ssize_t sec_get_pwrsrc(char *buf);
 char* qpnp_pon_get_off_reason(void);
