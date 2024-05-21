@@ -81,10 +81,12 @@ module_param_named(dump_sink, dump_sink, uint, 0644);
 static unsigned int reboot_multicmd;
 module_param_named(reboot_multicmd, reboot_multicmd, uint, 0644);
 
+#ifdef CONFIG_SEC_DEBUG
 uint64_t get_pa_dump_sink(void)
 {
 	return virt_to_phys(&dump_sink);
 }
+#endif
 
 /* This is shared with msm-power off module. */
 void __iomem *restart_reason;
@@ -98,9 +100,11 @@ static void __iomem *watchdog_base;
 
 void (*sec_nvmem_pon_write)(u8 pon_rr) = NULL;
 
+#ifdef CONFIG_SEC_DEBUG
 DEFINE_PER_CPU(struct sec_debug_core_t, sec_debug_core_reg);
 DEFINE_PER_CPU(struct sec_debug_mmu_reg_t, sec_debug_mmu_reg);
 DEFINE_PER_CPU(enum sec_debug_upload_cause_t, sec_debug_upload_cause);
+#endif
 
 static void sec_debug_set_qc_dload_magic(int on)
 {
@@ -511,6 +515,7 @@ __done:
 	       __func__, sec_rr, pon_rr);
 }
 
+#ifdef CONFIG_SEC_DEBUG
 void sec_debug_set_upload_cause(enum sec_debug_upload_cause_t type)
 {
 	if (unlikely(!upload_cause)) {
@@ -534,6 +539,7 @@ enum sec_debug_upload_cause_t sec_debug_get_upload_cause(void)
 
 	return readl(upload_cause);
 }
+#endif
 
 #ifdef CONFIG_SEC_PERIPHERAL_SECURE_CHK
 void sec_peripheral_secure_check_fail(void)
@@ -693,7 +699,9 @@ static int sec_debug_panic_handler(struct notifier_block *nb,
 #define MAX_STR_LEN 80
 	size_t len, i;
 
+#ifdef CONFIG_SEC_DEBUG
 	emerg_pet_watchdog(); /* CTC-should be modify */
+#endif
 #ifdef CONFIG_SEC_USER_RESET_DEBUG
 	sec_debug_store_backtrace();
 #endif
@@ -705,13 +713,17 @@ static int sec_debug_panic_handler(struct notifier_block *nb,
 		len = strnlen(buf, MAX_STR_LEN);
 		if (__sec_debug_strncmp(buf, upload_cause_st[i].msg, len,
 					upload_cause_st[i].func)) {
+#ifdef CONFIG_SEC_DEBUG
 			sec_debug_set_upload_cause(upload_cause_st[i].type);
+#endif
 			break;
 		}
 	}
 
 	if (i == ARRAY_SIZE(upload_cause_st))
+#ifdef CONFIG_SEC_DEBUG
 		sec_debug_set_upload_cause(UPLOAD_CAUSE_KERNEL_PANIC);
+#endif
 
 	if (!sec_debug_is_enabled()) {
 #ifdef CONFIG_SEC_DEBUG_LOW_LOG
@@ -738,7 +750,9 @@ static int sec_debug_panic_handler(struct notifier_block *nb,
 	/* save context here so that function call after this point doesn't
 	 * corrupt stacks below the saved sp
 	 */
+#ifdef CONFIG_SEC_DEBUG
 	sec_debug_save_context();
+#endif
 	__sec_debug_hw_reset();
 
 	return 0;
@@ -750,7 +764,9 @@ void sec_debug_prepare_for_wdog_bark_reset(void)
 	sec_delay_check = 0;
 #endif
 	sec_debug_set_upload_magic(RESTART_REASON_SEC_DEBUG_MODE);
+#ifdef CONFIG_SEC_DEBUG
 	sec_debug_set_upload_cause(UPLOAD_CAUSE_NON_SECURE_WDOG_BARK);
+#endif
 }
 
 static struct notifier_block nb_reboot_block = {
@@ -858,7 +874,9 @@ static int __init sec_debug_init(void)
 	atomic_notifier_chain_register(&panic_notifier_list, &nb_panic_block);
 
 	sec_debug_set_upload_magic(RESTART_REASON_SEC_DEBUG_MODE);
+#ifdef CONFIG_SEC_DEBUG
 	sec_debug_set_upload_cause(UPLOAD_CAUSE_INIT);
+#endif
 
 	/* TODO: below code caused reboot fail when debug level LOW */
 	switch (sec_dbg_level) {
@@ -886,6 +904,7 @@ static int __init sec_debug_init(void)
 }
 arch_initcall_sync(sec_debug_init);
 
+#ifdef CONFIG_SEC_DEBUG
 bool sec_debug_is_enabled(void)
 {
 	switch (sec_dbg_level) {
@@ -903,6 +922,7 @@ unsigned int sec_debug_level(void)
 {
 	return sec_dbg_level;
 }
+#endif
 
 #ifdef CONFIG_SEC_SSR_DEBUG_LEVEL_CHK
 int sec_debug_is_enabled_for_ssr(void)
@@ -1222,5 +1242,7 @@ void __deprecated sec_debug_set_thermal_upload(void)
 {
 	pr_emerg("set thermal upload cause\n");
 	sec_debug_set_upload_magic(0x776655ee);
+#ifdef CONFIG_SEC_DEBUG
 	sec_debug_set_upload_cause(UPLOAD_CAUSE_POWER_THERMAL_RESET);
+#endif
 }

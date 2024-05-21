@@ -151,7 +151,7 @@ void panic(const char *fmt, ...)
 #endif
 	trace_kernel_panic(0);
 
-#ifdef CONFIG_SEC_DEBUG
+#ifdef CONFIG_SEC_DEBUG || CONFIG_SEC_DEBUG_DUMMY
 	/*To prevent watchdog reset during panic handling. */
 	emerg_pet_watchdog();
 #endif

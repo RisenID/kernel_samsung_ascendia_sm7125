@@ -35,7 +35,7 @@
 #include <linux/qpnp/qpnp-pbs.h>
 #include <linux/qpnp/qpnp-misc.h>
 
-#ifdef CONFIG_SEC_DEBUG
+#ifdef CONFIG_SEC_DEBUG || CONFIG_SEC_DEBUG_DUMMY
 #include <linux/sec_debug.h>
 #endif
 

@@ -177,7 +177,7 @@ typedef enum {
 	USER_UPLOAD_CAUSE_MAX = USER_UPLOAD_CAUSE_UNKNOWN,
 } user_upload_cause_t;
 
-#if IS_ENABLED(CONFIG_SEC_DEBUG)
+#if IS_ENABLED(CONFIG_SEC_DEBUG) || IS_ENABLED(CONFIG_SEC_DEBUG_DUMMY)
 enum pon_restart_reason {
 /**********************************************/
 /* Following values came from qpnp-power-on.h */
@@ -292,7 +292,7 @@ enum pon_restart_reason {
 	PON_RESTART_REASON_MAX			= 0x80
 #endif
 };
-#endif /* CONFIG_SEC_DEBUG */
+#endif /* CONFIG_SEC_DEBUG || CONFIG_SEC_DEBUG_DUMMY */
 
 #if IS_ENABLED(CONFIG_SEC_DEBUG)
 
@@ -358,11 +358,61 @@ extern void __deprecated sec_debug_print_model(struct seq_file *m, const char *c
 /* FIXME: this function is not referenced anywhere */
 extern void __deprecated sec_debug_set_thermal_upload(void);
 
-#else /* CONFIG_SEC_DEBUG */
+#elif IS_ENABLED(CONFIG_SEC_DEBUG_DUMMY)
+
+#include <asm/sec_debug.h>
 
 static inline bool sec_debug_is_enabled(void) { return false; }
 static inline unsigned int sec_debug_level(void) { return 0; }
-static inline void sec_debug_strcpy_task_comm(char *dst, char *src) {}
+
+static __always_inline void sec_debug_strcpy_task_comm(char *dst, char *src)
+{
+#if (TASK_COMM_LEN == 16)
+	*(unsigned __int128 *)dst = *(unsigned __int128 *)src;
+#else
+	memcpy(dst, src, TASK_COMM_LEN);
+#endif
+}
+
+/* called @ drivers/power/reset/msm-poweroff.c */
+extern void sec_debug_update_dload_mode(const int restart_mode, const int in_panic);
+
+/* called @ drivers/power/reset/msm-poweroff.c */
+extern void sec_debug_update_restart_reason(const char *cmd, const int in_panic, const int restart_mode);
+
+/* called @ drivers/soc/qcom/watchdog_v2.c */
+extern void sec_debug_prepare_for_wdog_bark_reset(void);
+
+static inline void emerg_pet_watchdog(void) {}
+
+/* called @ init/main.c */
+extern char *sec_debug_get_erased_command_line(void);
+
+/* called @ drivers/debug/sec_debug_summary.c */
+extern uint64_t get_pa_dump_sink(void);
+
+/* FIXME: this is only for SAMSUNG internal */
+/* called @ drivers/misc/samsung/sec_hw_param.c */
+extern void sec_debug_upload_cause_str(enum sec_debug_upload_cause_t type, char *str, size_t len);
+
+/* FIXME: this function is not referenced anywhere */
+extern void __deprecated sec_debug_print_model(struct seq_file *m, const char *cpu_name);
+
+/* FIXME: this function is not referenced anywhere */
+extern void __deprecated sec_debug_set_thermal_upload(void);
+
+#else
+
+static inline bool sec_debug_is_enabled(void) { return false; }
+static inline unsigned int sec_debug_level(void) { return 0; }
+static __always_inline void sec_debug_strcpy_task_comm(char *dst, char *src)
+{
+#if (TASK_COMM_LEN == 16)
+	*(unsigned __int128 *)dst = *(unsigned __int128 *)src;
+#else
+	memcpy(dst, src, TASK_COMM_LEN);
+#endif
+}
 static inline void sec_debug_save_context(void) {}
 static inline void sec_debug_update_dload_mode(const int restart_mode, const int in_panic) {}
 static inline void sec_debug_update_restart_reason(const char *cmd, const int in_panic, const int restart_mode) {}

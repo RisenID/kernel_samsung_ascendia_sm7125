@@ -21,7 +21,7 @@
 #ifndef SEC_DEBUG_ARM64_H
 #define SEC_DEBUG_ARM64_H
 
-#if defined(CONFIG_ARM64) && defined(CONFIG_SEC_DEBUG)
+#if defined(CONFIG_ARM64) && ( defined(CONFIG_SEC_DEBUG) || defined(CONFIG_SEC_DEBUG_DUMMY))
 
 struct sec_debug_mmu_reg_t {
 	uint64_t TTBR0_EL1;

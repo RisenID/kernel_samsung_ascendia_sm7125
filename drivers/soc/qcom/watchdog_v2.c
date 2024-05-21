@@ -583,7 +583,9 @@ static irqreturn_t wdog_bark_handler(int irq, void *dev_id)
 
 	if (wdog_dd->do_ipi_ping)
 		dump_cpu_alive_mask(wdog_dd);
+#ifdef CONFIG_SEC_DEBUG
 	emerg_pet_watchdog();
+#endif
 	/* to see wdog_dd->watchdog_task status */
 	sched_show_task(wdog_dd->watchdog_task);
 	/* send stop IPI to see what happens on other cores */
