@@ -65,7 +65,6 @@
 		zinitix,aot;
 		zinitix,mis_cal_check;
 		support_ear_detect_mode;
-		support_dex_mode;
 		zinitix,bringup = <0>;
 //		zinitix,tclm_level = <0x2>;
 //		zinitix,afe_base = <0xe>;
@@ -90,7 +89,6 @@
 		stm,enable_settings_aot;
 		support_ear_detect;
 		support_mis_calibration_test;
-		support_dex_mode;
 		support_open_short_test;
 		support_sram_test;
 //		support_hall_ic;
